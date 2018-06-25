@@ -1,10 +1,10 @@
 {
   "name": "gendiff_ka",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Compares two configuration files and shows a difference",
   "main": "index.js",
   "bin": {
-    "gendiff": "dist/bin/brain-games.js"
+    "gendiff": "dist/bin/gendiff.js"
   },
   "files": [
     "dist"
