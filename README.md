@@ -10,6 +10,7 @@ Compares two configuration files and shows a difference
 ## Install
 
 npm install -g gendiff
+<<<<<<< HEAD
 
 ## Usage
 
@@ -20,3 +21,5 @@ gendiff [options] <firstConfig> <secondConfig>
     -h, --help           output usage information
     -V, --version        output the version number
     -f, --format [type]  Output format
+=======
+>>>>>>> 6b6b723fd47a2ae5cc794ef33b58b5d42de92230
