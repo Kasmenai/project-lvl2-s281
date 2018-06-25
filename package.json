@@ -1,0 +1,34 @@
+{
+  "name": "gendiff_ka",
+  "version": "1.0.0",
+  "description": "Compares two configuration files and shows a difference",
+  "main": "index.js",
+  "bin": {
+    "gendiff": "dist/bin/brain-games.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "babel-node": "babel-node",
+    "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kasmenai",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-eslint": "^8.2.5",
+    "eslint": "^5.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-babel": "^5.1.0",
+    "eslint-config-airbnb-base": "^13.0.0"
+  },
+  "dependencies": {
+    "commander": "^2.15.1"
+  }
+}
