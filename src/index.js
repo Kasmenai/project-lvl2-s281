@@ -1,44 +1,67 @@
 import fs from 'fs';
-import { has } from 'lodash';
+import { has, union, find } from 'lodash';
 
-const render = (obj) => {
-  const unchanged = obj.unchanged.map(el => Object.keys(el).map(key => `  ${key}: ${el[key]}`));
-  const added = obj.added.map(el => Object.keys(el).map(key => `+ ${key}: ${el[key]}`));
-  const deleted = obj.deleted.map(el => Object.keys(el).map(key => `- ${key}: ${el[key]}`));
-
-  const changed = obj.changed.map(el => Object.keys(el)
-    .map(key => `- ${key}: ${el[key][0]}\n  + ${key}: ${el[key][1]}`));
-
-  return `{\n  ${unchanged.join('\n  ')}\n  ${changed.join('\n  ')}\n  ${added.join('\n  ')}\n  ${deleted.join('\n  ')}\n}`;
+const render = (arr) => {
+  const str = arr.map((obj) => {
+    const {
+      key, oldVal, newVal, type,
+    } = obj;
+    switch (type) {
+      case 'deleted':
+        return `  - ${key}: ${oldVal}`;
+      case 'added':
+        return `  + ${key}: ${newVal}`;
+      case 'changed':
+        return `  - ${key}: ${oldVal}\n  + ${key}: ${newVal}`;
+      default:
+        return `    ${key}: ${oldVal}`;
+    }
+  }).join('\n');
+  return `{\n${str}\n}`;
 };
 
+const typeActions = [
+  {
+    type: 'added',
+    check: (key, obj1) => !has(obj1, key),
+  },
+  {
+    type: 'deleted',
+    check: (key, obj1, obj2) => !has(obj2, key),
+  },
+  {
+    type: 'unchanged',
+    check: (key, obj1, obj2) => obj1[key] === obj2[key],
+  },
+  {
+    type: 'changed',
+    check: (key, obj1, obj2) => obj1[key] !== obj2[key],
+  },
+];
 
-export default (before, after) => {
-  const contentsBefore = fs.readFileSync(before).toString();
-  const contentsAfter = fs.readFileSync(after).toString();
-  const BeforeObj = JSON.parse(contentsBefore);
-  const AfterObj = JSON.parse(contentsAfter);
-  const BeforeObjKeys = Object.keys(BeforeObj);
-  const AfterObjKeys = Object.keys(AfterObj);
+const getTypeAction = (key, obj1, obj2) => find(typeActions, ({ check }) => check(key, obj1, obj2));
 
-  const root = {
-    deleted: [],
-    added: [],
-    changed: [],
-    unchanged: [],
-  };
-  const allKeys = [...new Set(BeforeObjKeys.concat(AfterObjKeys))];
+const parse = (obj1, obj2) => {
+  const allKeys = union(Object.keys(obj1), Object.keys(obj2));
   const newObj = allKeys.reduce((acc, key) => {
-    if (has(BeforeObj, key)) {
-      if (has(AfterObj, key)) {
-        return BeforeObj[key] === AfterObj[key]
-          ? { ...acc, unchanged: [...acc.unchanged, { [key]: AfterObj[key] }] }
-          : { ...acc, changed: [...acc.changed, { [key]: [BeforeObj[key], AfterObj[key]] }] };
-      }
-      return { ...acc, deleted: [...acc.deleted, { [key]: BeforeObj[key] }] };
-    }
-    return { ...acc, added: [...acc.added, { [key]: AfterObj[key] }] };
-  }, root);
+    const { type } = getTypeAction(key, obj1, obj2);
+    return [...acc, {
+      key,
+      oldVal: obj1[key],
+      newVal: obj2[key],
+      type,
+    }];
+  }, []);
+  return newObj;
+};
+
+export default (obj1, obj2) => {
+  const contentsObj1 = fs.readFileSync(obj1).toString();
+  const contentsObj2 = fs.readFileSync(obj2).toString();
+  const data1 = JSON.parse(contentsObj1);
+  const data2 = JSON.parse(contentsObj2);
+
+  const newObj = parse(data1, data2);
   // console.log(newObj);
   // console.log(render(newObj));
   return render(newObj);
