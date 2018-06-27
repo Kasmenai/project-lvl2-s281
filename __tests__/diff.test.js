@@ -9,3 +9,7 @@ test('genDiff_json', () => {
 test('genDiff_yml', () => {
   expect(genDiff('__tests__/__fixtures__/before.yml', '__tests__/__fixtures__/after.yml')).toBe(expected);
 });
+
+test('genDiff_ini', () => {
+  expect(genDiff('__tests__/__fixtures__/before.ini', '__tests__/__fixtures__/after.ini')).toBe(expected);
+});
