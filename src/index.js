@@ -6,7 +6,7 @@ import parse from './parsers';
 const render = (arr) => {
   const str = arr.map((obj) => {
     const {
-      key, oldVal, newVal, type,
+      key, oldVal, newVal, type, children,
     } = obj;
     switch (type) {
       case 'deleted':
@@ -14,7 +14,8 @@ const render = (arr) => {
       case 'added':
         return `  + ${key}: ${newVal}`;
       case 'changed':
-        return `  - ${key}: ${oldVal}\n  + ${key}: ${newVal}`;
+        return (children) ? `    ${key}: ${render(children)}`
+          : `  - ${key}: ${oldVal}\n  + ${key}: ${newVal}`;
       default:
         return `    ${key}: ${oldVal}`;
     }
@@ -43,15 +44,25 @@ const typeActions = [
 
 const getTypeAction = (key, obj1, obj2) => find(typeActions, ({ check }) => check(key, obj1, obj2));
 
-const buildArr = (obj1, obj2) => {
+const buildAST = (obj1, obj2) => {
   const allKeys = union(Object.keys(obj1), Object.keys(obj2));
   const newArr = allKeys.reduce((acc, key) => {
     const { type } = getTypeAction(key, obj1, obj2);
+    if (type === 'changed' && (obj1[key] instanceof Object) && (obj2[key] instanceof Object)) {
+      return [...acc, {
+        key,
+        oldVal: null,
+        newVal: null,
+        type,
+        children: buildAST(obj1[key], obj2[key]),
+      }];
+    }
     return [...acc, {
       key,
       oldVal: obj1[key],
       newVal: obj2[key],
       type,
+      children: null,
     }];
   }, []);
   return newArr;
@@ -63,8 +74,8 @@ export default (obj1, obj2) => {
   const data1 = parse(contentsObj1, path.extname(obj1));
   const data2 = parse(contentsObj2, path.extname(obj2));
 
-  const newArr = buildArr(data1, data2);
-  // console.log(newArr);
-  // console.log(render(newArr));
-  return render(newArr);
+  const newAST = buildAST(data1, data2);
+  // console.log('newAST=', newAST);
+  // console.log(render(newAST));
+  return render(newAST);
 };
