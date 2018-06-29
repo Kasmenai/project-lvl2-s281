@@ -77,12 +77,16 @@ const typeActions = [
   },
 ];
 
-const getTypeAction = (key, obj1, obj2) => _.find(typeActions, ({ check }) => check(key, obj1, obj2));
+const getTypeAction = (key, obj1, obj2) => {
+  _.find(typeActions, ({ check }) => check(key, obj1, obj2));
+};
 
 const buildAST = (obj1, obj2) => {
   const allKeys = _.union(_.keys(obj1), _.keys(obj2));
   const newArr = allKeys.reduce((acc, key) => {
-    const { type, process, oldValFn, newValFn } = getTypeAction(key, obj1, obj2);
+    const {
+      type, process, oldValFn, newValFn,
+    } = getTypeAction(key, obj1, obj2);
     return [...acc, {
       key,
       oldVal: oldValFn(key, obj1, obj2),
