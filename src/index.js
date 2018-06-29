@@ -2,42 +2,7 @@ import fs from 'fs';
 import _ from 'lodash';
 import path from 'path';
 import parse from './parsers';
-
-
-const stringify = (obj, currentDepth) => {
-  if (!_.isObject(obj)) {
-    return obj;
-  }
-  const tab = '    '.repeat(currentDepth);
-  const result = _.keys(obj)
-    .map(key => `${tab}    ${key}: ${stringify(obj[key], currentDepth + 1)}`).join('\n');
-  return `{\n${result}\n${tab}}`;
-};
-
-const render = (arr, i = 0) => {
-  const currentDepth = i;
-  const tab = '    '.repeat(currentDepth);
-  const result = arr.map((obj) => {
-    const {
-      key, oldValue, newValue, type, children,
-    } = obj;
-    const oldString = `${key}: ${stringify(oldValue, currentDepth + 1)}`;
-    const newString = `${key}: ${stringify(newValue, currentDepth + 1)}`;
-    switch (type) {
-      case 'deleted':
-        return `${tab}  - ${oldString}`;
-      case 'added':
-        return `${tab}  + ${newString}`;
-      case 'changed':
-        return `${tab}  - ${oldString}\n${tab}  + ${newString}`;
-      case 'hasChildren':
-        return `${tab}    ${key}: ${render(children, currentDepth + 1)}`;
-      default:
-        return `${tab}    ${oldString}`;
-    }
-  }).join('\n');
-  return `{\n${result}\n${tab}}`;
-};
+import render from './renders';
 
 const typeActions = [
   {
