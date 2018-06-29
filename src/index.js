@@ -43,37 +43,27 @@ const typeActions = [
   {
     type: 'added',
     check: (key, obj1) => !_.has(obj1, key),
-    oldValFn: () => null,
-    newValFn: (key, obj1, obj2) => obj2[key],
-    process: () => null,
+    process: (oldVal, newVal) => ({ oldVal: null, newVal }),
   },
   {
     type: 'deleted',
     check: (key, obj1, obj2) => !_.has(obj2, key),
-    oldValFn: (key, obj1) => obj1[key],
-    newValFn: () => null,
-    process: () => null,
+    process: oldVal => ({ oldVal, newVal: null }),
   },
   {
     type: 'unchanged',
     check: (key, obj1, obj2) => obj1[key] === obj2[key],
-    oldValFn: (key, obj1) => obj1[key],
-    newValFn: (key, obj1, obj2) => obj2[key],
-    process: () => null,
+    process: (oldVal, newVal) => ({ oldVal, newVal }),
   },
   {
     type: 'hasChildren',
     check: (key, obj1, obj2) => _.isObject(obj1[key]) && _.isObject(obj2[key]),
-    process: (obj1, obj2, f) => f(obj1, obj2),
-    oldValFn: () => null,
-    newValFn: () => null,
+    process: (oldVal, newVal, f) => ({ children: f(oldVal, newVal) }),
   },
   {
     type: 'changed',
     check: (key, obj1, obj2) => obj1[key] !== obj2[key],
-    oldValFn: (key, obj1) => obj1[key],
-    newValFn: (key, obj1, obj2) => obj2[key],
-    process: () => null,
+    process: (oldVal, newVal) => ({ oldVal, newVal }),
   },
 ];
 
@@ -82,19 +72,12 @@ const getTypeAction = (key, obj1, obj2) => _
 
 const buildAST = (obj1, obj2) => {
   const allKeys = _.union(_.keys(obj1), _.keys(obj2));
-  const newArr = allKeys.reduce((acc, key) => {
-    const {
-      type, process, oldValFn, newValFn,
-    } = getTypeAction(key, obj1, obj2);
-    return [...acc, {
-      key,
-      oldVal: oldValFn(key, obj1, obj2),
-      newVal: newValFn(key, obj1, obj2),
-      type,
-      children: process(obj1[key], obj2[key], buildAST),
-    }];
+
+  return allKeys.reduce((acc, key) => {
+    const { type, process } = getTypeAction(key, obj1, obj2);
+    const node = { key, type, ...process(obj1[key], obj2[key], buildAST) };
+    return [...acc, node];
   }, []);
-  return newArr;
 };
 
 export default (obj1, obj2) => {
