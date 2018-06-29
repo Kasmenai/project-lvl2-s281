@@ -43,12 +43,12 @@ const typeActions = [
   {
     type: 'added',
     check: (key, obj1) => !_.has(obj1, key),
-    process: (oldValue, newValue) => ({ oldValue: null, newValue }),
+    process: (oldValue, newValue) => ({ newValue }),
   },
   {
     type: 'deleted',
     check: (key, obj1, obj2) => !_.has(obj2, key),
-    process: oldValue => ({ oldValue, newValue: null }),
+    process: oldValue => ({ oldValue }),
   },
   {
     type: 'unchanged',
