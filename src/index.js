@@ -4,66 +4,66 @@ import path from 'path';
 import parse from './parsers';
 
 
-const stringify = (obj, currDepth) => {
+const stringify = (obj, currentDepth) => {
   if (!_.isObject(obj)) {
     return obj;
   }
-  const tab = '    '.repeat(currDepth);
-  const qq = _.keys(obj)
-    .map(key => `${tab}    ${key}: ${stringify(obj[key], currDepth + 1)}`).join('\n');
-  return `{\n${qq}\n${tab}}`;
+  const tab = '    '.repeat(currentDepth);
+  const result = _.keys(obj)
+    .map(key => `${tab}    ${key}: ${stringify(obj[key], currentDepth + 1)}`).join('\n');
+  return `{\n${result}\n${tab}}`;
 };
 
 const render = (arr, i = 0) => {
-  const currDepth = i;
-  const tab = '    '.repeat(currDepth);
-  const str = arr.map((obj) => {
+  const currentDepth = i;
+  const tab = '    '.repeat(currentDepth);
+  const result = arr.map((obj) => {
     const {
-      key, oldVal, newVal, type, children,
+      key, oldValue, newValue, type, children,
     } = obj;
-    const oldStr = `${key}: ${stringify(oldVal, currDepth + 1)}`;
-    const newStr = `${key}: ${stringify(newVal, currDepth + 1)}`;
+    const oldString = `${key}: ${stringify(oldValue, currentDepth + 1)}`;
+    const newString = `${key}: ${stringify(newValue, currentDepth + 1)}`;
     switch (type) {
       case 'deleted':
-        return `${tab}  - ${oldStr}`;
+        return `${tab}  - ${oldString}`;
       case 'added':
-        return `${tab}  + ${newStr}`;
+        return `${tab}  + ${newString}`;
       case 'changed':
-        return `${tab}  - ${oldStr}\n${tab}  + ${newStr}`;
+        return `${tab}  - ${oldString}\n${tab}  + ${newString}`;
       case 'hasChildren':
-        return `${tab}    ${key}: ${render(children, currDepth + 1)}`;
+        return `${tab}    ${key}: ${render(children, currentDepth + 1)}`;
       default:
-        return `${tab}    ${oldStr}`;
+        return `${tab}    ${oldString}`;
     }
   }).join('\n');
-  return `{\n${str}\n${tab}}`;
+  return `{\n${result}\n${tab}}`;
 };
 
 const typeActions = [
   {
     type: 'added',
     check: (key, obj1) => !_.has(obj1, key),
-    process: (oldVal, newVal) => ({ oldVal: null, newVal }),
+    process: (oldValue, newValue) => ({ oldValue: null, newValue }),
   },
   {
     type: 'deleted',
     check: (key, obj1, obj2) => !_.has(obj2, key),
-    process: oldVal => ({ oldVal, newVal: null }),
+    process: oldValue => ({ oldValue, newValue: null }),
   },
   {
     type: 'unchanged',
     check: (key, obj1, obj2) => obj1[key] === obj2[key],
-    process: (oldVal, newVal) => ({ oldVal, newVal }),
+    process: (oldValue, newValue) => ({ oldValue, newValue }),
   },
   {
     type: 'hasChildren',
     check: (key, obj1, obj2) => _.isObject(obj1[key]) && _.isObject(obj2[key]),
-    process: (oldVal, newVal, f) => ({ children: f(oldVal, newVal) }),
+    process: (oldValue, newValue, f) => ({ children: f(oldValue, newValue) }),
   },
   {
     type: 'changed',
     check: (key, obj1, obj2) => obj1[key] !== obj2[key],
-    process: (oldVal, newVal) => ({ oldVal, newVal }),
+    process: (oldValue, newValue) => ({ oldValue, newValue }),
   },
 ];
 
