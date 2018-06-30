@@ -25,14 +25,14 @@ const render = (arr, i = 0) => {
       case 'added':
         return `${tab}  + ${newString}`;
       case 'changed':
-        return `${tab}  - ${oldString}\n${tab}  + ${newString}`;
+        return [`${tab}  - ${oldString}`, `${tab}  + ${newString}`];
       case 'hasChildren':
         return `${tab}    ${key}: ${render(children, currentDepth + 1)}`;
       default:
         return `${tab}    ${oldString}`;
     }
-  }).join('\n');
-  return `{\n${result}\n${tab}}`;
+  });
+  return `{\n${_.flatten(result).join('\n')}\n${tab}}`;
 };
 
 export default render;
