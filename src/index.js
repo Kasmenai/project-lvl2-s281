@@ -45,7 +45,7 @@ const buildAST = (obj1, obj2) => {
   }, []);
 };
 
-export default (obj1, obj2) => {
+export default (obj1, obj2, format) => {
   const contentsObj1 = fs.readFileSync(obj1).toString();
   const contentsObj2 = fs.readFileSync(obj2).toString();
   const data1 = parse(contentsObj1, path.extname(obj1));
@@ -54,5 +54,5 @@ export default (obj1, obj2) => {
   const newAST = buildAST(data1, data2);
   // console.log('newAST=', newAST);
   // console.log(render(newAST));
-  return render(newAST);
+  return render(newAST, format);
 };

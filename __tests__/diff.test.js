@@ -20,6 +20,10 @@ test('genDiff_ini', () => {
 });
 
 test('genDiff_ast', () => {
-  const expected2 = fs.readFileSync(path.join(testPath, '/expected2')).toString();
-  expect(genDiff(path.join(testPath, '/before2.json'), path.join(testPath, '/after2.json'))).toBe(expected2);
+  const expected = fs.readFileSync(path.join(testPath, '/expected2')).toString();
+  expect(genDiff(path.join(testPath, '/before2.json'), path.join(testPath, '/after2.json'))).toBe(expected);
+});
+test('genDiff_plain', () => {
+  const expected = fs.readFileSync(path.join(testPath, '/expected3')).toString();
+  expect(genDiff(path.join(testPath, '/before2.json'), path.join(testPath, '/after2.json'), 'plain')).toBe(expected);
 });
