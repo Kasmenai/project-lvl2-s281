@@ -2,7 +2,7 @@ import fs from 'fs';
 import _ from 'lodash';
 import path from 'path';
 import parse from './parsers';
-import render from './renders';
+import render from './renderers';
 
 const typeActions = [
   {
