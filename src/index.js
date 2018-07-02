@@ -52,7 +52,6 @@ export default (obj1, obj2, format) => {
   const data2 = parse(contentsObj2, path.extname(obj2));
 
   const newAST = buildAST(data1, data2);
-  // console.log('newAST=', newAST);
-  // console.log(render(newAST));
+
   return render(newAST, format);
 };

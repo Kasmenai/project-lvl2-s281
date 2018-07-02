@@ -1,13 +1,13 @@
 import plainRender from './plain';
-import defaultRender from './pretty';
+import prettyRender from './pretty';
 
 const renderers = {
   plain: plainRender,
-  prettty: defaultRender,
+  pretty: prettyRender,
   json: JSON.stringify,
 };
 
-export default (data, format = 'prettty') => {
+export default (data, format = 'pretty') => {
   const render = renderers[format];
   if (!render) {
     throw new Error(`unkown format: ${format}`);
