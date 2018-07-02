@@ -4,7 +4,7 @@ import genDiff from '../src';
 
 const testPath = '__tests__/__fixtures__/';
 
-test('genDiff_json', () => {
+test('genDiff_pretty', () => {
   const expected = fs.readFileSync(path.join(testPath, '/expected')).toString();
   expect(genDiff(path.join(testPath, '/before.json'), path.join(testPath, '/after.json'))).toBe(expected);
 });
@@ -26,4 +26,9 @@ test('genDiff_ast', () => {
 test('genDiff_plain', () => {
   const expected = fs.readFileSync(path.join(testPath, '/expected3')).toString();
   expect(genDiff(path.join(testPath, '/before2.json'), path.join(testPath, '/after2.json'), 'plain')).toBe(expected);
+});
+
+test('genDiff_json', () => {
+  const expected = fs.readFileSync(path.join(testPath, '/expected4')).toString();
+  expect(genDiff(path.join(testPath, '/before2.json'), path.join(testPath, '/after2.json'), 'json')).toBe(expected);
 });
