@@ -4,31 +4,18 @@ import genDiff from '../src';
 
 const testPath = '__tests__/__fixtures__/';
 
-test('genDiff_pretty', () => {
+const exts = ['json', 'yml', 'ini'];
+exts.forEach((ext) => {
   const expected = fs.readFileSync(path.join(testPath, '/expected')).toString();
-  expect(genDiff(path.join(testPath, '/before.json'), path.join(testPath, '/after.json'))).toBe(expected);
+  test(`genDiff_pretty_${ext}`, () => {
+    expect(genDiff(path.join(testPath, `/before.${ext}`), path.join(testPath, `/after.${ext}`))).toBe(expected);
+  });
 });
 
-test('genDiff_yml', () => {
-  const expected = fs.readFileSync(path.join(testPath, '/expected')).toString();
-  expect(genDiff(path.join(testPath, '/before.yml'), path.join(testPath, '/after.yml'))).toBe(expected);
-});
-
-test('genDiff_ini', () => {
-  const expected = fs.readFileSync(path.join(testPath, '/expected')).toString();
-  expect(genDiff(path.join(testPath, '/before.ini'), path.join(testPath, '/after.ini'))).toBe(expected);
-});
-
-test('genDiff_ast', () => {
-  const expected = fs.readFileSync(path.join(testPath, '/expected2')).toString();
-  expect(genDiff(path.join(testPath, '/before2.json'), path.join(testPath, '/after2.json'))).toBe(expected);
-});
-test('genDiff_plain', () => {
-  const expected = fs.readFileSync(path.join(testPath, '/expected3')).toString();
-  expect(genDiff(path.join(testPath, '/before2.json'), path.join(testPath, '/after2.json'), 'plain')).toBe(expected);
-});
-
-test('genDiff_json', () => {
-  const expected = fs.readFileSync(path.join(testPath, '/expected4')).toString();
-  expect(genDiff(path.join(testPath, '/before2.json'), path.join(testPath, '/after2.json'), 'json')).toBe(expected);
+const formats = ['pretty', 'plain', 'json'];
+formats.forEach((format) => {
+  const expected = fs.readFileSync(path.join(testPath, `/expected_${format}`)).toString();
+  test(`genDiff_${format}`, () => {
+    expect(genDiff(path.join(testPath, '/before2.json'), path.join(testPath, '/after2.json'), format)).toBe(expected);
+  });
 });
